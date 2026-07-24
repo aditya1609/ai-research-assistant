@@ -18,8 +18,8 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 
 # Generation settings
-TEMPERATURE = float(os.environ.get("TEMPERATURE", "0.1"))
-MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "1024"))
+TEMPERATURE = float(os.environ.get("TEMPERATURE", "0.2"))
+MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "2048"))
 
 # --- Documents used for RAG ---
 # By default we index the committed, non-confidential sample_docs folder.
@@ -36,4 +36,4 @@ EMBED_MODEL = os.environ.get("EMBED_MODEL", "BAAI/bge-small-en-v1.5")
 # --- Chunking + retrieval ---
 CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE", "1000"))
 CHUNK_OVERLAP = int(os.environ.get("CHUNK_OVERLAP", "150"))
-TOP_K = int(os.environ.get("TOP_K", "4"))
+TOP_K = int(os.environ.get("TOP_K", "6"))
