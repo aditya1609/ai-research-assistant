@@ -36,7 +36,13 @@ def build_index(force: bool = False) -> int:
 
     chunks = _split(documents)
     vs = get_vectorstore()
-    vs.add_documents(chunks)
+
+    # Embed + insert in small batches so memory never spikes (important on
+    # low-RAM cloud hosts like Streamlit Community Cloud).
+    batch_size = 16
+    for i in range(0, len(chunks), batch_size):
+        vs.add_documents(chunks[i : i + batch_size])
+
     print(f"[ingest] Indexed {len(chunks)} chunks from {len(documents)} document parts.")
     return len(chunks)
 

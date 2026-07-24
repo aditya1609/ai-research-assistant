@@ -14,7 +14,8 @@ def get_embeddings():
     """FastEmbed (ONNX) embeddings — small and torch-free, ideal for cloud."""
     from langchain_community.embeddings import FastEmbedEmbeddings
 
-    return FastEmbedEmbeddings(model_name=config.EMBED_MODEL)
+    # threads=1 keeps memory/CPU low on small shared cloud hosts.
+    return FastEmbedEmbeddings(model_name=config.EMBED_MODEL, threads=1)
 
 
 def get_vectorstore():
