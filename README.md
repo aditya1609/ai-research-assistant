@@ -11,8 +11,19 @@ store), **FastEmbed** (lightweight local embeddings), and a **Groq** LLM
 (free, fast). The same code also runs on OpenAI or a local Ollama model by
 flipping one environment variable.
 
-> This is the **publicly shareable** version: it ships with fictional, non-confidential
-> sample documents and a cloud LLM, so **anyone can run or deploy it** with a free API key.
+> This is the **publicly shareable** version: it ships with real, open-access
+> **AI research papers** (Transformers, RAG, LoRA) from arXiv and a cloud LLM,
+> so **anyone can run or deploy it** with a free API key.
+
+---
+
+## 🎬 Demo
+
+![Demo — asking about the attention mechanism, answered from the Transformer paper with a citation](docs/images/demo.png)
+
+*The agent recognizes a documents question, calls the `search_documents` tool,
+retrieves the relevant chunks from the "Attention Is All You Need" PDF, and
+answers with a source citation.*
 
 ---
 
@@ -81,10 +92,10 @@ The first run downloads the small embedding model and builds the index
 http://localhost:8501).
 
 Try:
-- *"How much PTO do full-time employees get, and what is that per month?"* (documents + math)
-- *"What does the PulseBoard Business plan cost per year with annual billing?"* (documents + math)
-- *"What is retrieval-augmented generation?"* (documents)
-- *"What is the latest version of Python?"* (web)
+- *"What is the main idea behind the attention mechanism?"* (Transformer paper)
+- *"How does retrieval-augmented generation reduce hallucination?"* (RAG paper)
+- *"What problem does LoRA solve in fine-tuning?"* (LoRA paper)
+- *"What is the latest version of Python?"* (falls back to web search)
 
 ---
 
@@ -141,10 +152,12 @@ ai-research-assistant-cloud/
 ├── config.py              # env-driven configuration
 ├── requirements.txt
 ├── .env.example
-├── sample_docs/           # non-confidential demo documents (committed)
-│   ├── company_handbook.md
-│   ├── product_faq.md
-│   └── ml_glossary.md
+├── download_papers.py     # one-time helper to fetch arXiv PDFs
+├── sample_docs/           # open-access AI papers, committed (swap in your own)
+│   ├── 1706.03762v7.pdf   # Attention Is All You Need (Transformers)
+│   ├── 2005.11401v4.pdf   # Retrieval-Augmented Generation
+│   └── 2106.09685v2.pdf   # LoRA: Low-Rank Adaptation
+├── docs/images/           # README screenshots
 └── src/
     ├── store.py           # shared embeddings + Chroma vector store
     ├── loaders.py         # .md / .txt / .pdf loaders
