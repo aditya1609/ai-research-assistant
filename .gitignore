@@ -2,8 +2,9 @@
 .env
 .streamlit/secrets.toml
 
-# Vector store (rebuilt automatically from sample_docs on first run)
-chroma_db/
+# Vector store: committed as a prebuilt index so cloud hosts don't have to
+# embed documents at startup (avoids out-of-memory on small free tiers).
+# (Local rebuilds via the "Rebuild index" button will update these files.)
 
 # Python
 __pycache__/
