@@ -1,0 +1,21 @@
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Vector store (rebuilt automatically from sample_docs on first run)
+chroma_db/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# FastEmbed model cache
+.fastembed_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

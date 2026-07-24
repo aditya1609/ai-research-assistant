@@ -1,0 +1,28 @@
+# --- LLM + orchestration ---
+langchain>=0.3.7
+langchain-core>=0.3.15
+langchain-community>=0.3.5
+langgraph>=0.2.45
+langchain-text-splitters>=0.3.2
+
+# --- LLM providers (Groq is the free default) ---
+langchain-groq>=0.2.1
+langchain-openai>=0.2.5      # optional, only if LLM_PROVIDER=openai
+langchain-ollama>=0.2.0      # optional, only if LLM_PROVIDER=ollama (local)
+
+# --- Vector store + embeddings (cloud-friendly, no torch needed) ---
+langchain-chroma>=0.1.4
+chromadb>=0.5.15
+fastembed>=0.4.2             # ONNX embeddings, lightweight (great for cloud)
+
+# --- Document loaders ---
+pypdf>=5.0.0                 # PDF support
+
+# --- Agent tools ---
+ddgs>=6.3.0                 # free DuckDuckGo web search (no API key)
+
+# --- UI ---
+streamlit>=1.39.0
+
+# --- Local .env loading (optional) ---
+python-dotenv>=1.0.1
