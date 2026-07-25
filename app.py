@@ -67,7 +67,7 @@ st.markdown(
       .hero .byline {
         display:inline-block; margin-top:14px; padding:6px 14px;
         background: rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.35);
-        border-radius: 999px; font-size:.86rem; font-weight:600; backdrop-filter: blur(4px);
+        border-radius: 999px; font-size:.86rem; font-weight:600;
       }
       .pills { margin-top:14px; }
       .pill {
@@ -99,6 +99,15 @@ st.markdown(
         padding-top:14px; border-top:1px solid #eef0f3;
       }
       .footer a { color:#6d28d9; text-decoration:none; font-weight:600; }
+      /* Never allow horizontal overflow on small screens */
+      .hero, .side-card { max-width:100%; box-sizing:border-box; overflow-wrap:anywhere; }
+      /* Mobile tweaks */
+      @media (max-width: 640px) {
+        .hero { padding:20px 18px; border-radius:16px; }
+        .hero h1 { font-size:1.5rem; }
+        .hero p  { font-size:.92rem; }
+        .pill { font-size:.72rem; padding:4px 9px; }
+      }
     </style>
     """,
     unsafe_allow_html=True,
