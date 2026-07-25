@@ -65,15 +65,19 @@ def _build_llm():
             extra["http_async_client"] = httpx.AsyncClient(verify=False)
 
         # Reasoning models (gpt-oss, qwen, deepseek) need a parsed reasoning
-        # format for tool-calling to work reliably on Groq.
+        # format for tool-calling to work reliably on Groq. We also keep the
+        # reasoning effort low so responses stay fast.
         model = config.GROQ_MODEL
         if any(tag in model for tag in ("gpt-oss", "qwen", "deepseek")):
             extra["reasoning_format"] = "parsed"
+            extra["reasoning_effort"] = "low"
 
         return ChatGroq(
             model=model,
             temperature=config.TEMPERATURE,
             max_tokens=config.MAX_TOKENS,
+            request_timeout=60,
+            max_retries=2,
             **extra,
         )
 
@@ -115,7 +119,10 @@ def ask(question: str, history=None) -> str:
         messages.append((role, content))
     messages.append(("user", question))
 
-    result = agent.invoke({"messages": messages})
+    result = agent.invoke(
+        {"messages": messages},
+        config={"recursion_limit": 12},
+    )
     return result["messages"][-1].content
 
 
