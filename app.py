@@ -211,6 +211,8 @@ st.markdown(
 # ---------------- Chat state ----------------
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "awaiting" not in st.session_state:
+    st.session_state.awaiting = False
 
 EXAMPLES = [
     "What is the main idea behind the attention mechanism?",
@@ -228,31 +230,36 @@ if not st.session_state.messages:
         if cols[i % 2].button(ex, key=f"ex_{i}", use_container_width=True):
             pending = ex
 
-# Render conversation
+# Render the existing conversation.
 for role, content in st.session_state.messages:
     avatar = "🧑‍💻" if role == "user" else "🤖"
     with st.chat_message(role, avatar=avatar):
         st.markdown(content)
 
-# Input (chat box or an example click)
-typed = st.chat_input("Ask a question about the documents, the web, or math…")
-user_prompt = typed or pending
-
-if user_prompt:
-    st.session_state.messages.append(("user", user_prompt))
-    with st.chat_message("user", avatar="🧑‍💻"):
-        st.markdown(user_prompt)
-
+# If the last message is an unanswered question, generate the answer now.
+# This runs in its OWN rerun and keeps `awaiting` True until an answer is
+# appended, so a mobile keyboard/resize rerun can't lose the response — it
+# simply retries on the next run until it completes.
+if st.session_state.awaiting and st.session_state.messages:
+    question = st.session_state.messages[-1][1]
     with st.chat_message("assistant", avatar="🤖"):
         with st.spinner("Thinking…"):
             try:
                 history = st.session_state.messages[:-1]
-                answer = ask(user_prompt, history=history)
+                answer = ask(question, history=history)
             except Exception as exc:  # noqa: BLE001
                 answer = f"⚠️ Error: {exc}"
         st.markdown(answer)
-
     st.session_state.messages.append(("assistant", answer))
+    st.session_state.awaiting = False
+
+# Input (chat box or an example click). Ignore new input while answering.
+typed = st.chat_input("Ask a question about the documents, the web, or math…")
+user_prompt = typed or pending
+
+if user_prompt and not st.session_state.awaiting:
+    st.session_state.messages.append(("user", user_prompt))
+    st.session_state.awaiting = True
     st.rerun()
 
 # ---------------- Footer ----------------
