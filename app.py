@@ -127,6 +127,18 @@ model = {
     "ollama": config.OLLAMA_MODEL,
 }.get(provider, "?")
 
+# Prepare the index once (needed for answering). Technical details are only
+# surfaced in the hidden admin view.
+try:
+    n_chunks = _prepare_index()
+    index_error = None
+except Exception as exc:  # noqa: BLE001
+    n_chunks, index_error = 0, str(exc)
+
+# Admin view is enabled by adding ?admin=1 to the URL. Regular visitors get a
+# clean sidebar without technical status or the (expensive) rebuild control.
+ADMIN = str(st.query_params.get("admin", "")) == "1"
+
 # ---------------- Sidebar ----------------
 with st.sidebar:
     st.markdown(
@@ -140,55 +152,53 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    key_ok = (
-        (provider == "groq" and os.environ.get("GROQ_API_KEY"))
-        or (provider == "openai" and os.environ.get("OPENAI_API_KEY"))
-        or (provider == "ollama")
-    )
-
-    try:
-        n_chunks = _prepare_index()
-        index_line = f'<span class="status-ok">✅ {n_chunks} chunks indexed</span>'
-    except Exception as exc:  # noqa: BLE001
-        index_line = f'<span class="status-bad">Index error: {exc}</span>'
-
-    key_line = (
-        '<span class="status-ok">✅ API key detected</span>'
-        if key_ok
-        else '<span class="status-bad">⚠️ Missing API key</span>'
-    )
-
-    st.markdown(
-        f"""
-        <div class="side-card">
-          <p class="side-sub"><b>Status</b></p>
-          <div class="doc-item">{key_line}</div>
-          <div class="doc-item">{index_line}</div>
-          <div class="doc-item">LLM: <code>{provider}</code> · <code>{model}</code></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
+    # Knowledge base — public, so visitors know what topics it can answer.
     docs_html = ""
     if os.path.isdir(config.DOCS_DIR):
         for name in sorted(os.listdir(config.DOCS_DIR)):
             if os.path.splitext(name)[1].lower() in config.SUPPORTED_EXTENSIONS:
                 docs_html += f'<div class="doc-item">📄 {name}</div>'
     st.markdown(
-        f'<div class="side-card"><p class="side-sub"><b>Knowledge base</b></p>{docs_html}</div>',
+        f'<div class="side-card"><p class="side-sub"><b>📚 Knowledge base</b></p>{docs_html}</div>',
         unsafe_allow_html=True,
     )
 
-    col_a, col_b = st.columns(2)
-    with col_a:
-        if st.button("🔁 Rebuild", use_container_width=True):
+    if st.button("🧹 Clear chat", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.awaiting = False
+        st.rerun()
+
+    # ---- Admin-only controls (hidden unless ?admin=1) ----
+    if ADMIN:
+        key_ok = (
+            (provider == "groq" and os.environ.get("GROQ_API_KEY"))
+            or (provider == "openai" and os.environ.get("OPENAI_API_KEY"))
+            or (provider == "ollama")
+        )
+        key_line = (
+            '<span class="status-ok">✅ API key detected</span>'
+            if key_ok
+            else '<span class="status-bad">⚠️ Missing API key</span>'
+        )
+        index_line = (
+            f'<span class="status-ok">✅ {n_chunks} chunks indexed</span>'
+            if not index_error
+            else f'<span class="status-bad">Index error: {index_error}</span>'
+        )
+        st.markdown(
+            f"""
+            <div class="side-card">
+              <p class="side-sub"><b>🔧 Admin · Status</b></p>
+              <div class="doc-item">{key_line}</div>
+              <div class="doc-item">{index_line}</div>
+              <div class="doc-item">LLM: <code>{provider}</code> · <code>{model}</code></div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🔁 Rebuild index", use_container_width=True):
             ingest.build_index(force=True)
             _prepare_index.clear()
-            st.rerun()
-    with col_b:
-        if st.button("🧹 Clear", use_container_width=True):
-            st.session_state.messages = []
             st.rerun()
 
     st.markdown(
