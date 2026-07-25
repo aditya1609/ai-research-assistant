@@ -1,0 +1,9 @@
+# Force a consistent LIGHT theme so text stays dark and readable even when the
+# user's device (especially mobile) is in dark mode. Without this, dark-mode
+# phones render light text on the app's light background -> invisible answers.
+[theme]
+base = "light"
+primaryColor = "#6d28d9"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f5f3ff"
+textColor = "#111827"
